@@ -1,20 +1,31 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { DateRange } from "react-day-picker";
+import { startOfMonth, endOfMonth } from "date-fns";
 import Header from "@/components/Header";
 import FilterControls from "@/components/FilterControls";
 import InteractionChart from "@/components/InteractionChart";
 import CelebrityTable from "@/components/CelebrityTable";
 import StatsCards from "@/components/StatsCards";
 import TopReactionsChart from "@/components/TopReactionsChart";
-import { formatDate, startOfMonth, endOfMonth } from "@/lib/utils"; // Import utilities from new utils file
-import type { TopCelebrity, Stats } from "@/lib/utils"; // Import types from new utils file
+import { formatDate } from "@/lib/utils";
+import type { TopCelebrity, Stats } from "@/lib/utils";
 import type { TopReactionCelebrity } from "@/lib/database";
 
 export default function Dashboard() {
   const [selectedTopic, setSelectedTopic] = useState("all");
   const [selectedSentiment, setSelectedSentiment] = useState("all");
-  const [selectedTimeRange, setSelectedTimeRange] = useState("this_month");
+
+  // Initialize with current month range
+  const now = new Date();
+  const [selectedDateRange, setSelectedDateRange] = useState<
+    DateRange | undefined
+  >({
+    from: new Date(2025, 4, 1), // Tháng 5 là 4 (0-based)
+    to: new Date(2025, 4, 31),
+  });
+
   const [topCelebrities, setTopCelebrities] = useState<TopCelebrity[]>([]);
   const [topReactions, setTopReactions] = useState<TopReactionCelebrity[]>([]);
   const [stats, setStats] = useState<Stats>({
@@ -48,32 +59,18 @@ export default function Dashboard() {
     []
   );
 
-  // Calculate date range based on selection
-  const getDateRange = (timeRange: string) => {
-    const now = new Date();
-    switch (timeRange) {
-      case "this_month":
-        return { from: startOfMonth(now), to: endOfMonth(now) };
-      case "last_month":
-        const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-        return { from: startOfMonth(lastMonth), to: endOfMonth(lastMonth) };
-      case "this_week":
-        const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
-        const endOfWeek = new Date(
-          now.setDate(now.getDate() - now.getDay() + 6)
-        );
-        return { from: startOfWeek, to: endOfWeek };
-      case "last_week":
-        const lastWeekStart = new Date(
-          now.setDate(now.getDate() - now.getDay() - 7)
-        );
-        const lastWeekEnd = new Date(
-          now.setDate(now.getDate() - now.getDay() - 1)
-        );
-        return { from: lastWeekStart, to: lastWeekEnd };
-      default:
-        return { from: startOfMonth(now), to: endOfMonth(now) };
+  // Get date range for API calls
+  const getApiDateRange = (dateRange: DateRange | undefined) => {
+    if (!dateRange || !dateRange.from) {
+      // Default to current month if no range selected
+      const now = new Date();
+      return { from: startOfMonth(now), to: endOfMonth(now) };
     }
+
+    return {
+      from: dateRange.from,
+      to: dateRange.to || dateRange.from, // If only start date selected, use same date for end
+    };
   };
 
   const fetchData = useCallback(
@@ -83,7 +80,7 @@ export default function Dashboard() {
       }
 
       try {
-        const dateRange = getDateRange(selectedTimeRange);
+        const dateRange = getApiDateRange(selectedDateRange);
         const params = new URLSearchParams({
           startDate: formatDate(dateRange.from),
           endDate: formatDate(dateRange.to),
@@ -129,9 +126,9 @@ export default function Dashboard() {
         setDataHash(newHash);
         setLastUpdated(new Date());
 
-        console.log("Fetched celebrities data:", newCelebrities); // Debug log
-        console.log("Fetched reactions data:", newReactions); // Debug log
-        console.log("Fetched stats data:", newStats); // Debug log
+        console.log("Fetched celebrities data:", newCelebrities);
+        console.log("Fetched reactions data:", newReactions);
+        console.log("Fetched stats data:", newStats);
       } catch (error) {
         console.error("Lỗi khi tải dữ liệu:", error);
         setTopCelebrities([]);
@@ -152,7 +149,7 @@ export default function Dashboard() {
     [
       selectedTopic,
       selectedSentiment,
-      selectedTimeRange,
+      selectedDateRange,
       dataHash,
       createDataHash,
     ]
@@ -161,7 +158,7 @@ export default function Dashboard() {
   useEffect(() => {
     fetchData();
     setCurrentPage(1); // Reset to first page when filters change
-  }, [selectedTopic, selectedSentiment, selectedTimeRange, fetchData]);
+  }, [selectedTopic, selectedSentiment, selectedDateRange, fetchData]);
 
   // Auto-refresh effect
   useEffect(() => {
@@ -201,8 +198,8 @@ export default function Dashboard() {
           setSelectedTopic={setSelectedTopic}
           selectedSentiment={selectedSentiment}
           setSelectedSentiment={setSelectedSentiment}
-          selectedTimeRange={selectedTimeRange}
-          setSelectedTimeRange={setSelectedTimeRange}
+          selectedDateRange={selectedDateRange}
+          setSelectedDateRange={setSelectedDateRange}
         />
 
         <InteractionChart

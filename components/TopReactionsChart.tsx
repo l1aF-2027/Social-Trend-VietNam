@@ -1,7 +1,18 @@
 import {
-  Card, CardContent, CardDescription, CardHeader, CardTitle,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
+import {
+  Bar,
+  BarChart,
+  ResponsiveContainer,
+  XAxis,
+  YAxis,
+  Tooltip,
+} from "recharts";
 import { sanitizeImageUrl, topics, formatNumber } from "@/lib/utils";
 import type { TopReactionCelebrity } from "@/lib/database";
 
@@ -23,9 +34,12 @@ export default function TopReactionsChart({
           Biểu Đồ Tương Tác Top 10
         </CardTitle>
         <CardDescription>
-          Hiển thị tổng số tương tác cho 10 người nổi tiếng có nhiều tương tác nhất
+          Hiển thị tổng số tương tác cho 10 người nổi tiếng có nhiều tương tác
+          nhất
           {selectedTopic !== "all" &&
-            ` - Chủ đề: ${topics.find((t) => t.value === selectedTopic)?.label}`}
+            ` - Chủ đề: ${
+              topics.find((t) => t.value === selectedTopic)?.label
+            }`}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -36,7 +50,9 @@ export default function TopReactionsChart({
             </div>
           ) : topReactions.length === 0 ? (
             <div className="flex items-center justify-center h-full">
-              <div className="text-gray-500">Không có dữ liệu để hiển thị cho chủ đề này</div>
+              <div className="text-gray-500">
+                Không có dữ liệu để hiển thị cho chủ đề này
+              </div>
             </div>
           ) : (
             <ResponsiveContainer width="100%" height="100%">
@@ -47,15 +63,21 @@ export default function TopReactionsChart({
               >
                 <XAxis
                   dataKey="celebrity_name"
+                  interval={0}
                   tick={({ x, y, payload }) => (
-                    <foreignObject x={x - 40} y={y + 10} width={80} height={40}>
+                    <foreignObject
+                      x={x - 50}
+                      y={y + 10}
+                      width={100}
+                      height={40}
+                    >
                       <div
                         style={{
                           width: "80px",
                           textAlign: "center",
                           fontSize: 12,
                           color: "#374151",
-                          fontWeight: 500,
+                          fontWeight: 400,
                           wordBreak: "break-word",
                           whiteSpace: "normal",
                           lineHeight: "1.1",
@@ -68,6 +90,7 @@ export default function TopReactionsChart({
                   axisLine={{ stroke: "#e5e7eb", strokeWidth: 1 }}
                   tickLine={{ stroke: "#e5e7eb" }}
                 />
+
                 <YAxis
                   tick={{ fill: "#6b7280", fontSize: 12 }}
                   axisLine={{ stroke: "#e5e7eb", strokeWidth: 1 }}

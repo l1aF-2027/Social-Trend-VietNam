@@ -5,15 +5,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { topics, sentimentFilters, timeRanges } from "@/lib/utils"; // Import from new utils file
+import DateRangePicker from "@/components/DateRangePicker";
+import { topics, sentimentFilters } from "@/lib/utils";
+import { DateRange } from "react-day-picker";
 
 interface FilterControlsProps {
   selectedTopic: string;
   setSelectedTopic: (topic: string) => void;
   selectedSentiment: string;
   setSelectedSentiment: (sentiment: string) => void;
-  selectedTimeRange: string;
-  setSelectedTimeRange: (timeRange: string) => void;
+  selectedDateRange: DateRange | undefined;
+  setSelectedDateRange: (dateRange: DateRange | undefined) => void;
 }
 
 export default function FilterControls({
@@ -21,12 +23,12 @@ export default function FilterControls({
   setSelectedTopic,
   selectedSentiment,
   setSelectedSentiment,
-  selectedTimeRange,
-  setSelectedTimeRange,
+  selectedDateRange,
+  setSelectedDateRange,
 }: FilterControlsProps) {
   return (
     <div className="mb-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Chủ đề
@@ -66,25 +68,14 @@ export default function FilterControls({
           </Select>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Thời Gian
+        <div className="border-blue-200">
+          <label className="block text-sm font-medium text-gray-700 mb-2 ">
+            Khoảng Thời Gian
           </label>
-          <Select
-            value={selectedTimeRange}
-            onValueChange={setSelectedTimeRange}
-          >
-            <SelectTrigger className="bg-white border-blue-200">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {timeRanges.map((range) => (
-                <SelectItem key={range.value} value={range.value}>
-                  {range.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <DateRangePicker
+            value={selectedDateRange}
+            onChange={setSelectedDateRange}
+          />
         </div>
       </div>
     </div>

@@ -197,7 +197,7 @@ export default function InteractionChart({
 
                 <XAxis
                   dataKey="name"
-                  angle={0} // Để tên nằm ngang
+                  angle={0} 
                   textAnchor="middle"
                   height={70}
                   interval={0}
@@ -209,7 +209,7 @@ export default function InteractionChart({
                           textAlign: "center",
                           fontSize: 12,
                           color: "#374151",
-                          fontWeight: 500,
+                          fontWeight: 400,
                           wordBreak: "break-word",
                           whiteSpace: "normal",
                           lineHeight: "1.1",

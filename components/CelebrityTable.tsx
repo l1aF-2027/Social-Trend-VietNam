@@ -24,7 +24,8 @@ interface CelebrityTableProps {
   totalPages: number;
   setCurrentPage: (page: number | ((prev: number) => number)) => void;
   selectedTopic: string;
-  selectedSentiment: string; // Thêm dòng này
+  selectedSentiment: string;
+  totalReactions: number;
 }
 
 export default function CelebrityTable({
@@ -147,6 +148,12 @@ export default function CelebrityTable({
                 )}
                 {selectedSentiment === "all" && (
                   <th className="text-left py-3 px-4 font-medium text-gray-600">
+                    Lượt tương tác
+                  </th>
+                )}
+
+                {selectedSentiment === "all" && (
+                  <th className="text-left py-3 px-4 font-medium text-gray-600">
                     Tổng
                   </th>
                 )}
@@ -219,28 +226,35 @@ export default function CelebrityTable({
                       </td>
                       {(selectedSentiment === "all" ||
                         selectedSentiment === "positive") && (
-                        <td className="py-4 px-4 text-emerald-600 font-medium">
+                        <td className="py-4 px-4 text-emerald-600 font-medium text-center">
                           {formatNumber(Number(celebrity.total_positive) || 0)}
                         </td>
                       )}
                       {(selectedSentiment === "all" ||
                         selectedSentiment === "negative") && (
-                        <td className="py-4 px-4 text-rose-600 font-medium">
+                        <td className="py-4 px-4 text-rose-600 font-medium text-center">
                           {formatNumber(Number(celebrity.total_negative) || 0)}
                         </td>
                       )}
                       {(selectedSentiment === "all" ||
                         selectedSentiment === "neutral") && (
-                        <td className="py-4 px-4 text-purple-600 font-medium">
+                        <td className="py-4 px-4 text-purple-600 font-medium text-center">
                           {formatNumber(Number(celebrity.total_neutral) || 0)}
                         </td>
                       )}
                       {selectedSentiment === "all" && (
-                        <td className="py-4 px-4 font-bold text-gray-900">
+                        <td className="py-4 px-4 font-medium text-center text-blue-700">
+                          {formatNumber(Number(celebrity.total_reactions) || 0)}
+                        </td>
+                      )}
+
+                      {selectedSentiment === "all" && (
+                        <td className="py-4 px-4 font-bold text-gray-900 ">
                           {formatNumber(
                             (Number(celebrity.total_positive) || 0) +
                               (Number(celebrity.total_negative) || 0) +
-                              (Number(celebrity.total_neutral) || 0)
+                              (Number(celebrity.total_neutral) || 0) +
+                              (Number(celebrity.total_reactions) || 0)
                           )}
                         </td>
                       )}

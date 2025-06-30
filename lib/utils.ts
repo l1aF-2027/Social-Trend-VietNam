@@ -5,7 +5,6 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-// lib/utils.ts (ensure this matches the updated database.ts interface)
 // Utility functions
 export const formatDate = (date: Date): string => {
   return date.toISOString().split("T")[0];
@@ -50,7 +49,7 @@ export interface TopCelebrity {
   celebrity_name: string;
   celebrity_aliases: string | null;
   image_url: string | null;
-  is_celebrity: boolean; // Add this field
+  is_celebrity: boolean;
   total_positive: number;
   total_negative: number;
   total_neutral: number;
@@ -82,13 +81,6 @@ export const sentimentFilters = [
   { value: "all", label: "Tất cả" },
   { value: "positive", label: "Tích cực" },
   { value: "negative", label: "Tiêu cực" },
-];
-
-export const timeRanges = [
-  { value: "this_month", label: "Tháng này" },
-  { value: "last_month", label: "Tháng trước" },
-  { value: "this_week", label: "Tuần này" },
-  { value: "last_week", label: "Tuần trước" },
 ];
 
 // Aspect translations mapping

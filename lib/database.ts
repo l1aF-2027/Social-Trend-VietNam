@@ -36,12 +36,13 @@ export interface TopCelebrity {
   celebrity_name: string;
   celebrity_aliases: string | null;
   image_url: string | null;
-  is_celebrity: boolean; // Add this field
+  is_celebrity: boolean;
   total_positive: number;
   total_negative: number;
   total_neutral: number;
   total_interactions: number;
   main_aspects: string[];
+  total_reactions: number; 
 }
 
 export interface TopReactionCelebrity {
@@ -84,24 +85,27 @@ export async function getTopCelebrities(
       c.id as celebrity_id,
       c.name as celebrity_name,
       c.image_url,
-      c.is_celebrity, -- Include is_celebrity
+      c.is_celebrity,
       STRING_AGG(ca.alias, ', ') FILTER (WHERE ca.alias IS NOT NULL) as celebrity_aliases,
       COALESCE(SUM(i.positive_count), 0) as total_positive,
       COALESCE(SUM(i.negative_count), 0) as total_negative,
       COALESCE(SUM(i.neutral_count), 0) as total_neutral,
       COALESCE(SUM(i.positive_count + i.negative_count + i.neutral_count), 0) as total_interactions,
-      ARRAY_AGG(DISTINCT i.field) FILTER (WHERE i.field IS NOT NULL AND i.field != 'null') as main_aspects
+      ARRAY_AGG(DISTINCT i.field) FILTER (WHERE i.field IS NOT NULL AND i.field != 'null') as main_aspects,
+      COALESCE(SUM(r.total_reactions), 0) as total_reactions -- Thêm dòng này
     `;
 
-    // Base JOIN and WHERE clause, now including is_celebrity filter
+    // Base JOIN and WHERE clause
     const baseJoinWhere = (topicCondition: any) => sql`
       FROM celebrities c
       LEFT JOIN interactions i ON c.id = i.celebrity_id
         AND i.interaction_date BETWEEN ${startDate} AND ${endDate}
       LEFT JOIN celebrity_aliases ca ON c.id = ca.celebrity_id
-      WHERE c.is_celebrity = TRUE -- Filter for celebrities marked as true
+      LEFT JOIN reactions r ON c.id = r.celebrity_id
+        AND r.created_at BETWEEN ${startDate} AND ${endDate}
+      WHERE c.is_celebrity = TRUE
       ${topicCondition ? sql`AND (${topicCondition})` : sql``}
-      GROUP BY c.id, c.name, c.image_url, c.is_celebrity -- Group by is_celebrity
+      GROUP BY c.id, c.name, c.image_url, c.is_celebrity
       HAVING COALESCE(SUM(i.positive_count + i.negative_count + i.neutral_count), 0) > 0
     `;
 
