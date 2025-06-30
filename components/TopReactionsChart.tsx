@@ -97,7 +97,10 @@ export default function TopReactionsChart({
                   tickLine={{ stroke: "#e5e7eb" }}
                 />
                 <Tooltip
-                  formatter={(value) => formatNumber(Number(value))}
+                  formatter={(value) => [
+                    formatNumber(Number(value)),
+                    "Lượng tương tác",
+                  ]}
                   labelFormatter={(label) => label}
                   contentStyle={{
                     backgroundColor: "rgba(255, 255, 255, 0.95)",
