@@ -86,27 +86,48 @@ export async function getTopCelebrities(
       c.name as celebrity_name,
       c.image_url,
       c.is_celebrity,
-      STRING_AGG(ca.alias, ', ') FILTER (WHERE ca.alias IS NOT NULL) as celebrity_aliases,
-      COALESCE(SUM(i.positive_count), 0) as total_positive,
-      COALESCE(SUM(i.negative_count), 0) as total_negative,
-      COALESCE(SUM(i.neutral_count), 0) as total_neutral,
-      COALESCE(SUM(i.positive_count + i.negative_count + i.neutral_count), 0) as total_interactions,
-      ARRAY_AGG(DISTINCT i.field) FILTER (WHERE i.field IS NOT NULL AND i.field != 'null') as main_aspects,
-      COALESCE(SUM(r.total_reactions), 0) as total_reactions -- Thêm dòng này
+      aliases.celebrity_aliases,
+      COALESCE(inter.total_positive, 0) as total_positive,
+      COALESCE(inter.total_negative, 0) as total_negative,
+      COALESCE(inter.total_neutral, 0) as total_neutral,
+      COALESCE(inter.total_interactions, 0) as total_interactions,
+      inter.main_aspects,
+      COALESCE(react.total_reactions, 0) as total_reactions
     `;
 
     // Base JOIN and WHERE clause
     const baseJoinWhere = (topicCondition: any) => sql`
       FROM celebrities c
-      LEFT JOIN interactions i ON c.id = i.celebrity_id
-        AND i.interaction_date BETWEEN ${startDate} AND ${endDate}
-      LEFT JOIN celebrity_aliases ca ON c.id = ca.celebrity_id
-      LEFT JOIN reactions r ON c.id = r.celebrity_id
-        AND r.created_at BETWEEN ${startDate} AND ${endDate}
+      LEFT JOIN (
+        SELECT
+          i.celebrity_id,
+          SUM(i.positive_count) as total_positive,
+          SUM(i.negative_count) as total_negative,
+          SUM(i.neutral_count) as total_neutral,
+          SUM(i.positive_count + i.negative_count + i.neutral_count) as total_interactions,
+          ARRAY_AGG(DISTINCT i.field) FILTER (WHERE i.field IS NOT NULL AND i.field != 'null') as main_aspects
+        FROM interactions i
+        WHERE i.interaction_date BETWEEN ${startDate} AND ${endDate}
+        ${topicCondition ? sql`AND (${topicCondition})` : sql``}
+        GROUP BY i.celebrity_id
+      ) inter ON c.id = inter.celebrity_id
+      LEFT JOIN (
+        SELECT
+          ca.celebrity_id,
+          STRING_AGG(ca.alias, ', ') as celebrity_aliases
+        FROM celebrity_aliases ca
+        GROUP BY ca.celebrity_id
+      ) aliases ON c.id = aliases.celebrity_id
+      LEFT JOIN (
+        SELECT
+          r.celebrity_id,
+          SUM(r.total_reactions) as total_reactions
+        FROM reactions r
+        WHERE r.created_at BETWEEN ${startDate} AND ${endDate}
+        GROUP BY r.celebrity_id
+      ) react ON c.id = react.celebrity_id
       WHERE c.is_celebrity = TRUE
-      ${topicCondition ? sql`AND (${topicCondition})` : sql``}
-      GROUP BY c.id, c.name, c.image_url, c.is_celebrity
-      HAVING COALESCE(SUM(i.positive_count + i.negative_count + i.neutral_count), 0) > 0
+      AND COALESCE(inter.total_interactions, 0) > 0
     `;
 
     const topicCondition =

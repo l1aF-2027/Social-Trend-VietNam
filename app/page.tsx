@@ -192,7 +192,7 @@ export default function Dashboard() {
       <Header lastUpdated={lastUpdated} />
 
       <div className="max-w-7xl mx-auto px-6 py-6">
-        <StatsCards stats={stats} />
+        <StatsCards stats={stats} /> {/* stats luôn lấy từ state đã fetch */}
         <FilterControls
           selectedTopic={selectedTopic}
           setSelectedTopic={setSelectedTopic}
@@ -201,20 +201,17 @@ export default function Dashboard() {
           selectedDateRange={selectedDateRange}
           setSelectedDateRange={setSelectedDateRange}
         />
-
         <InteractionChart
           topCelebrities={topCelebrities}
           selectedSentiment={selectedSentiment}
           selectedTopic={selectedTopic}
           loading={loading}
         />
-
         <TopReactionsChart
           topReactions={topReactions}
           selectedTopic={selectedTopic}
           loading={loading}
         />
-
         <CelebrityTable
           currentCelebrities={currentCelebrities}
           loading={loading}
