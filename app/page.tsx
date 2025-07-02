@@ -97,11 +97,13 @@ export default function Dashboard() {
           ? celebritiesData
           : [];
 
-        // Fetch top reactions for new chart
+        // Fetch top reactions for new chart (THÊM topic & sentiment)
         const reactionsResponse = await fetch(
           `/api/top-reactions?startDate=${formatDate(
             dateRange.from
-          )}&endDate=${formatDate(dateRange.to)}`
+          )}&endDate=${formatDate(
+            dateRange.to
+          )}&topic=${selectedTopic}&sentiment=${selectedSentiment}`
         );
         const reactionsData = await reactionsResponse.json();
         const newReactions = Array.isArray(reactionsData) ? reactionsData : [];

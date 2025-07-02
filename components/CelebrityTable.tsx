@@ -41,8 +41,7 @@ export default function CelebrityTable({
   const getMainAspects = (celebrity: TopCelebrity) => {
     if (celebrity.main_aspects && celebrity.main_aspects.length > 0) {
       const translatedAspects = celebrity.main_aspects
-        .slice(0, 2) // Display up to 2 aspects
-        .map((aspect) => aspectTranslations[aspect] || aspect) // Translate or use original if no translation
+        .map((aspect) => aspectTranslations[aspect] || aspect)
         .join(", ");
       return translatedAspects;
     }

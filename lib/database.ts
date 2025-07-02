@@ -257,9 +257,40 @@ export async function deleteCelebrityAlias(id: number): Promise<void> {
 
 export async function getTopReactionCelebrities(
   startDate: string,
-  endDate: string
+  endDate: string,
+  topic?: string,
+  sentimentFilter?: "positive" | "negative" | "all"
 ): Promise<TopReactionCelebrity[]> {
   try {
+    // Lấy danh sách celebrity_id thỏa mãn filter giống getTopCelebrities
+    const topicCondition =
+      topic && topic !== "all" ? sql`i.field = ${topic}` : null;
+
+    let sentimentOrder: any;
+    if (sentimentFilter === "positive") {
+      sentimentOrder = sql`ORDER BY SUM(i.positive_count) DESC`;
+    } else if (sentimentFilter === "negative") {
+      sentimentOrder = sql`ORDER BY SUM(i.negative_count) DESC`;
+    } else {
+      sentimentOrder = sql`ORDER BY SUM(i.positive_count + i.negative_count + i.neutral_count) DESC`;
+    }
+
+    const celebrityIdsResult = await sql`
+      SELECT i.celebrity_id
+      FROM interactions i
+      JOIN celebrities c ON i.celebrity_id = c.id
+      WHERE i.interaction_date BETWEEN ${startDate} AND ${endDate}
+        AND c.is_celebrity = TRUE
+        ${topicCondition ? sql`AND (${topicCondition})` : sql``}
+      GROUP BY i.celebrity_id
+      HAVING SUM(i.positive_count + i.negative_count + i.neutral_count) > 0
+      ${sentimentOrder}
+      LIMIT 100
+    `;
+    const celebrityIds = celebrityIdsResult.map((row: any) => row.celebrity_id);
+    if (celebrityIds.length === 0) return [];
+
+    // Lấy top reactions chỉ với celebrity_id đã lọc
     const result = await sql`
       SELECT
         c.id as celebrity_id,
@@ -270,6 +301,7 @@ export async function getTopReactionCelebrities(
       LEFT JOIN reactions r ON c.id = r.celebrity_id
         AND r.created_at BETWEEN ${startDate} AND ${endDate}
       WHERE c.is_celebrity = TRUE
+        AND c.id = ANY(${celebrityIds})
       GROUP BY c.id, c.name, c.image_url
       HAVING COALESCE(SUM(r.total_reactions), 0) > 0
       ORDER BY total_reactions DESC
