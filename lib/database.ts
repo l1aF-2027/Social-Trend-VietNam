@@ -42,7 +42,7 @@ export interface TopCelebrity {
   total_neutral: number;
   total_interactions: number;
   main_aspects: string[];
-  total_reactions: number; 
+  total_reactions: number;
 }
 
 export interface TopReactionCelebrity {
@@ -269,8 +269,6 @@ export async function getTopReactionCelebrities(
       FROM celebrities c
       LEFT JOIN reactions r ON c.id = r.celebrity_id
         AND r.created_at BETWEEN ${startDate} AND ${endDate}
-      LEFT JOIN interactions i ON c.id = i.celebrity_id
-        AND i.interaction_date BETWEEN ${startDate} AND ${endDate}
       WHERE c.is_celebrity = TRUE
       GROUP BY c.id, c.name, c.image_url
       HAVING COALESCE(SUM(r.total_reactions), 0) > 0

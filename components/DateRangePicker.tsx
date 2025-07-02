@@ -11,8 +11,8 @@ interface DateRangePickerProps {
 }
 
 const DEFAULT_RANGE: DateRange = {
-  from: new Date(2025, 4, 1), // Tháng 5 là 4 (0-based)
-  to: new Date(2025, 4, 31),
+  from: new Date(2025, 6, 1), // Tháng 5 là 4 (0-based)
+  to: new Date(2025, 6, 6),
 };
 
 function formatRange(range: DateRange | undefined) {
