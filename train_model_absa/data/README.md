@@ -24,7 +24,7 @@ Each entry in the file is a JSON object with the following fields:
 | `comment_count`      | Number of comments                                                       |
 | `post_url`           | Direct link to the post                                                  |
 
-### 📥 Comment Field (`comment`)
+### Comment Field (`comment`)
 
 ```json
 "comment": {
