@@ -2,6 +2,7 @@
 
 An open-source platform to collect, analyze, and visualize social media trends in Vietnam, with a dedicated repo for training an ABSA model (aspect‑based sentiment analysis).
 
+<img width="1782" height="1104" alt="image" src="https://github.com/user-attachments/assets/4e59b896-0319-4c57-9953-9ba06550dcbd" />
 
 ## 📂 Repository Structure & Roles
 
@@ -21,14 +22,14 @@ Social‑Trend‑VietNam/
 
 ### 2. **streaming/**
 
-* Real-time data ingestion & message queuing (e.g. Kafka, RabbitMQ).
+* Real-time data ingestion & message queuing (e.g. Kafka).
 * Normalizes, enriches, and routes stream data to downstream components for processing and dashboard updates.
 
 ### 3. **train\_model\_absa/**
 
 * Responsible for building and fine-tuning an ABSA model to perform aspect‑based sentiment analysis.
-* Implements tasks such as Aspect Term Extraction (ATE), Opinion Term Extraction (OTE), Aspect Sentiment Classification (ASC), and Aspect‑Opinion‑Sentiment Triplet Extraction (ASTE) using transformer-based architectures like BERT + graph convolutional enhancements ([Nature][1]).
-* Could adopt modular frameworks like PyABSA for reproducible training across multiple datasets and tasks ([arXiv][2]).
+* Implements tasks such as Aspect Term Extraction (ATE), Opinion Term Extraction (OTE), Aspect Sentiment Classification (ASC), and Aspect‑Opinion‑Sentiment Triplet Extraction (ASTE) using transformer-based architectures like BERT + graph convolutional enhancements.
+* Could adopt modular frameworks like PyABSA for reproducible training across multiple datasets and tasks.
 * Parses data streams, assigns sentiment polarity per aspect, outputs labels to storage or streaming pipelines.
 
 ### 4. **frontend/**
@@ -44,8 +45,8 @@ Social‑Trend‑VietNam/
 ## 🧠 Workflow Overview
 
 1. **Crawl**: Platform-specific scripts fetch raw data periodically.
-2. **Stream**: Collected data enters the streaming pipeline where messages are normalized and pushed.
-3. **Train\_model\_absa**: Streams are classified by aspect & sentiment; results output in real time or batch.
+2. **Train\_model\_absa**: Streams are classified by aspect & sentiment; results output in real time or batch.
+3. **Stream**: Using Kafka and Pandas UDF to simulate how the big data work.
 4. **Frontend**: Visualizes trends and sentiment insights dynamically.
 
 This modular architecture supports scalability and easier maintenance. For example, you can update the ABSA model independently from the crawler or frontend.
