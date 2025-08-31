@@ -8,7 +8,7 @@ import argparse
 import google.generativeai as genai
 
 # Đường dẫn và các tham số
-IN_PATH = r"E:\Documents\DS200\final_project\facebook_crawl\data\json\data_filled.json"
+IN_PATH = r"D:\ASUS\Test\Social-Trend-VietNam\train_model_absa\data\data_labeled_soft_cleaned.json"
 OUT_DIR_BASE = r"E:\Documents\DS200\final_project\facebook_crawl\data\json"
 
 API_KEYS_FILE = r"E:\Documents\DS200\final_project\facebook_crawl\api_keys.txt"
@@ -27,24 +27,6 @@ PROMPT_SOFT = (
     "Không được tạo hoặc suy diễn bất kỳ nhãn nào khác ngoài danh sách này.\n"
     "Nếu không tìm thấy aspect liên quan, hãy đặt: Aspect_1: Other.\n"
     "Nếu chỉ có 1 aspect, Aspect_2 phải là null.\n\n"
-    "Nội dung đầy đủ:\n\"\"\"\n{content}\n\"\"\"\n\n"
-    "Trả kết quả ngắn gọn như sau (KHÔNG cần JSON):\n"
-    "Aspect_1: <tên>\n"
-    "Aspect_2: <tên hoặc null>\n"
-    "Sentiment: [<sentiment1>, <sentiment2>]\n"
-)
-
-PROMPT_STRICT = (
-    "Bạn là một hệ thống phân tích khía cạnh và cảm xúc cực kỳ chính xác, được sử dụng để đánh giá chất lượng dữ liệu huấn luyện AI.\n\n"
-    "Dưới đây là nội dung tổng hợp của một bài post và các bình luận liên quan (bao gồm mô tả ảnh nếu có).\n"
-    "Bạn cần đọc kỹ toàn bộ nội dung, bao gồm ẩn ý, bóng gió, mỉa mai, hoặc thành ngữ để phân tích theo các yêu cầu nghiêm ngặt sau:\n\n"
-    "- Chỉ chọn các **aspect** thật sự liên quan trực tiếp đến **chủ thể chính được đề cập đến** trong nội dung.\n"
-    "- Tối đa 2 aspect, bắt buộc phải thuộc đúng một trong các nhãn: Health, Fashion, Sport, Food, Art, Law, Other.\n"
-    "- **Nghiêm cấm** suy đoán hoặc gán nhãn dựa trên cảm nhận chủ quan nếu không có bằng chứng rõ ràng trong văn bản.\n"
-    "- Với mỗi aspect, xác định **sentiment** chính xác nhất (positive, negative, neutral), kể cả khi nội dung có sắc thái mỉa mai hoặc đa nghĩa.\n"
-    "- Nếu không có aspect rõ ràng liên quan đến chủ thể, đặt: Aspect_1: Other, Aspect_2: null.\n"
-    "- Nếu chỉ có một aspect, Aspect_2 phải là null.\n\n"
-    "⚠️ Bài kiểm tra này dùng để đánh giá chất lượng mô hình NLP, vì vậy bạn phải đưa ra đầu ra thật chính xác, đúng định dạng và không suy diễn.\n\n"
     "Nội dung đầy đủ:\n\"\"\"\n{content}\n\"\"\"\n\n"
     "Trả kết quả ngắn gọn như sau (KHÔNG cần JSON):\n"
     "Aspect_1: <tên>\n"
@@ -214,7 +196,7 @@ def main():
     selected_keys = api_keys[start_idx : start_idx + KEYS_PER_GROUP]
 
     # Chọn prompt theo nhóm
-    prompt = PROMPT_SOFT if args.key_group == 0 else PROMPT_STRICT
+    prompt = PROMPT_SOFT 
 
     # Chuẩn bị thư mục output cho từng loại prompt
     out_dir = os.path.join(OUT_DIR_BASE, "soft" if args.key_group == 0 else "strict")
